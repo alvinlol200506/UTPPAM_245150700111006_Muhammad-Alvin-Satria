@@ -1,5 +1,6 @@
 package com.example.utppam.screens
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -45,6 +46,7 @@ import com.example.utppam.utils.formatRupiah
 fun MenuListScreen(
     menuItems: SnapshotStateList<FoodItem>,
     onQuantityChange: (Int, Int) -> Unit,
+    onItemClick: (Int) -> Unit,
     onCheckout: () -> Unit
 ) {
     // remember + derivedStateOf for reactive computed totals
@@ -80,6 +82,7 @@ fun MenuListScreen(
                 items(menuItems, key = { it.id }) { item ->
                     FoodItemCard(
                         item = item,
+                        onItemClick = { onItemClick(item.id) },
                         onIncrement = { onQuantityChange(item.id, item.quantity + 1) },
                         onDecrement = {
                             if (item.quantity > 0) onQuantityChange(item.id, item.quantity - 1)
@@ -100,11 +103,14 @@ fun MenuListScreen(
 @Composable
 private fun FoodItemCard(
     item: FoodItem,
+    onItemClick: () -> Unit,
     onIncrement: () -> Unit,
     onDecrement: () -> Unit
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onItemClick() },
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
