@@ -29,6 +29,11 @@ class MainActivity : ComponentActivity() {
                         if (index != -1) {
                             menuItems[index] = menuItems[index].copy(quantity = newQuantity)
                         }
+                    },
+                    onResetOrders = {
+                        menuItems.indices.forEach { i ->
+                            menuItems[i] = menuItems[i].copy(quantity = 0)
+                        }
                     }
                 )
             }

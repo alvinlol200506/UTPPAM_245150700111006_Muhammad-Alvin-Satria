@@ -16,6 +16,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -44,7 +46,8 @@ import com.example.utppam.utils.formatRupiah
 fun MenuListScreen(
     menuItems: SnapshotStateList<FoodItem>,
     onQuantityChange: (Int, Int) -> Unit,
-    onItemClick: (Int) -> Unit
+    onItemClick: (Int) -> Unit,
+    onCheckout: () -> Unit
 ) {
     // remember + derivedStateOf for reactive computed totals
     val totalItems by remember { derivedStateOf { menuItems.sumOf { it.quantity } } }
@@ -90,7 +93,8 @@ fun MenuListScreen(
 
             OrderSummaryBar(
                 totalItems = totalItems,
-                totalPrice = totalPrice
+                totalPrice = totalPrice,
+                onCheckout = onCheckout
             )
         }
     }
@@ -168,7 +172,7 @@ private fun FoodItemCard(
 }
 
 @Composable
-private fun OrderSummaryBar(totalItems: Int, totalPrice: Int) {
+private fun OrderSummaryBar(totalItems: Int, totalPrice: Int, onCheckout: () -> Unit) {
     Surface(
         color = MaterialTheme.colorScheme.primaryContainer,
         tonalElevation = 8.dp
@@ -187,32 +191,53 @@ private fun OrderSummaryBar(totalItems: Int, totalPrice: Int) {
                 )
             }
         } else {
-            Row(
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                    .padding(horizontal = 20.dp, vertical = 16.dp)
             ) {
-                Column {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column {
+                        Text(
+                            text = "Order Summary",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
+                        )
+                        Text(
+                            text = "$totalItems item${if (totalItems > 1) "s" else ""}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Medium,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                    }
                     Text(
-                        text = "Order Summary",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
-                    )
-                    Text(
-                        text = "$totalItems item${if (totalItems > 1) "s" else ""}",
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Medium,
+                        text = totalPrice.formatRupiah(),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                 }
-                Text(
-                    text = totalPrice.formatRupiah(),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                )
+                Spacer(modifier = Modifier.height(12.dp))
+                Button(
+                    onClick = onCheckout,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary
+                    ),
+                    shape = MaterialTheme.shapes.large
+                ) {
+                    Text(
+                        text = "Checkout",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             }
         }
     }
