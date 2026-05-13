@@ -4,13 +4,10 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
+import com.example.utppam.data.sampleMenu
+import com.example.utppam.navigation.AppNavigation
 import com.example.utppam.ui.theme.UTPPAMTheme
 
 class MainActivity : ComponentActivity() {
@@ -19,29 +16,22 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             UTPPAMTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                // State hoisting: mutableStateListOf owned at the top level,
+                // passed down to all screens via AppNavigation
+                val menuItems = remember {
+                    mutableStateListOf(*sampleMenu.toTypedArray())
                 }
+
+                AppNavigation(
+                    menuItems = menuItems,
+                    onQuantityChange = { id, newQuantity ->
+                        val index = menuItems.indexOfFirst { it.id == id }
+                        if (index != -1) {
+                            menuItems[index] = menuItems[index].copy(quantity = newQuantity)
+                        }
+                    }
+                )
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    UTPPAMTheme {
-        Greeting("Android")
     }
 }
